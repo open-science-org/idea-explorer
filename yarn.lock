@@ -7894,6 +7894,13 @@ react-scripts@2.1.1:
   optionalDependencies:
     fsevents "1.2.4"
 
+react-web3@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-web3/-/react-web3-1.2.0.tgz#41863b5edc9d21fe93ed2831deb77782ad0dbe11"
+  integrity sha512-h2ic4ZeE3YTOFtpoMLCo8iwHSVatVzU+Z8zBj5T7TULDHgYEgnLh7iUi5Lle5qCfLJLF2fo0Tcz/Bm1h4BtVQA==
+  dependencies:
+    lodash "^4.17.11"
+
 react@^16.6.3:
   version "16.6.3"
   resolved "https://registry.yarnpkg.com/react/-/react-16.6.3.tgz#25d77c91911d6bbdd23db41e70fb094cc1e0871c"
