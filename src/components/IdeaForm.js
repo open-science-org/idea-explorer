@@ -1,58 +1,72 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import IPFS from 'ipfs';
+import { FormGroup, ControlLabel, FormControl, HelpBlock, Col, Button } from 'react-bootstrap';
 
 const stringToUse = 'hello world from webpacked IPFS';
  
 class IdeaForm extends React.Component {
   constructor (props, context) {
     super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.uploadIdeaTextToIPFS = this.uploadIdeaTextToIPFS.bind(this);
     this.ipfsNode = new IPFS({ repo: String(Math.random() + Date.now()) });
     this.state = {
-      id: null,
-      version: null,
-      protocol_version: null,
-      added_file_hash: null,
-      added_file_contents: null
+      ipfsOptions: {
+        id: null,
+        version: null,
+        protocol_version: null,
+      },
+      value: '',
+      added_file_hash: '',
+      added_file_contents: '',
     };
   }
 
-  create () {
-    // Create the IPFS node instance
-
-    this.ipfsNode.once('ready', () => {
-      console.log('IPFS node is ready');
-      this.ops();
-    })
-  }
-
-  ops () {
-    this.ipfsNode.id((err, res) => {
-      if (err) {
-        throw err
-      }
-      this.setState({
-        id: res.id,
-        version: res.agentVersion,
-        protocol_version: res.protocolVersion
-      });
-    })
-
-    this.ipfsNode.files.add([Buffer.from(stringToUse)], (err, filesAdded) => {
+  uploadIdeaTextToIPFS () {
+    this.ipfsNode.files.add([Buffer.from(this.state.value)], (err, filesAdded) => {
       if (err) { throw err }
 
       const hash = filesAdded[0].hash;
-      this.setState({ added_file_hash: hash });
 
       this.ipfsNode.files.cat(hash, (err, data) => {
         if (err) { throw err }
-        this.setState({ added_file_contents: data.toString() });
+        this.setState({
+          added_file_hash: hash,
+          added_file_contents: data.toString(),
+        });
       })
-    })
+    });
   }
 
   componentDidMount () {
-    this.create();
+    this.ipfsNode.once('ready', () => {
+      console.log('IPFS node is ready');
+      this.ipfsNode.id((err, res) => {
+        if (err) {
+          throw err
+        }
+        this.setState({
+          ipfsOptions: {
+            id: res.id,
+            version: res.agentVersion,
+            protocol_version: res.protocolVersion,
+          },
+        });
+      });
+    });
+  }
+
+  getValidationState() {
+    const length = this.state.value.length;
+    if (length > 10) return 'success';
+    else if (length > 5) return 'warning';
+    else if (length > 0) return 'error';
+    return null;
+  }
+
+  handleChange(e) {
+    this.setState({ value: e.target.value });
   }
 
  
@@ -68,22 +82,39 @@ class IdeaForm extends React.Component {
   render () {
     return (
       <div style={{ textAlign: 'center' }}>
-        <h1>Using your ethereum account: {this.context.web3.selectedAccount}</h1>
-        <h1>Everything is working!</h1>
-        <p>Your ID is <strong>{this.state.id}</strong></p>
-        <p>Your IPFS version is <strong>{this.state.version}</strong></p>
-        <p>Your IPFS protocol version is <strong>{this.state.protocol_version}</strong></p>
+        <h1>Connected to ethereum and ipfs network!</h1>
+        <p>Ethereum network: {this.context.web3.network}</p>
+        <p>Your IPFS version is <strong>{this.state.ipfsOptions.version}</strong></p>
+        <p>Your IPFS protocol version is <strong>{this.state.ipfsOptions.protocol_version}</strong></p>
         <hr />
-        <div>
-          Added a file! <br />
-          {this.state.added_file_hash}
-        </div>
-        <br />
-        <br />
-        <p>
-          Contents of this file: <br />
-          {this.state.added_file_contents}
-        </p>
+        <p>Using your ethereum account: {this.context.web3.selectedAccount}</p>
+        <p>Your IPFS ID is <strong>{this.state.ipfsOptions.id}</strong></p>
+        <hr />
+        <p>Submitted Idea's IPFS hash: {this.state.added_file_hash}</p>
+        <p>Submitted Idea's content: {this.state.added_file_contents}</p>
+        <hr />
+        <form>
+          <FormGroup
+            controlId="formBasicText"
+            validationState={this.getValidationState()}
+          >
+            <ControlLabel>Submit an Idea text to OSO Idea network</ControlLabel>
+            <FormControl
+              type="text"
+              bsSize="small"
+              value={this.state.value}
+              placeholder="Enter text"
+              onChange={this.handleChange}
+            />
+            <FormControl.Feedback />
+            <HelpBlock>String should be more than 10 characters long.</HelpBlock>
+          </FormGroup>
+          <FormGroup>
+            <Col smOffset={2} sm={10}>
+              <Button onClick={this.uploadIdeaTextToIPFS}>Submit Idea</Button>
+            </Col>
+          </FormGroup>
+        </form>
       </div>
     )
   }

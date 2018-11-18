@@ -21,7 +21,7 @@ function Dashboard(props, context) {
       <PageHeader>
         Idea Hub: <small>Submit and view ideas in OSO Idea Network</small>
       </PageHeader>
-      <Tabs defaultActiveKey={2} id="uncontrolled-tab-example">
+      <Tabs defaultActiveKey={1} id="uncontrolled-tab-example">
         <Tab eventKey={1} title="Submit an Idea">
           <IdeaForm />
         </Tab>
