@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import IPFS from 'ipfs';
 import { FormGroup, ControlLabel, FormControl, HelpBlock, Col, Button } from 'react-bootstrap';
 
-const stringToUse = 'hello world from webpacked IPFS';
- 
+const PUBLIC_GATEWAY = 'https://ipfs.io/ipfs';
+
 class IdeaForm extends React.Component {
   constructor (props, context) {
     super(props);
@@ -41,7 +41,6 @@ class IdeaForm extends React.Component {
 
   componentDidMount () {
     this.ipfsNode.once('ready', () => {
-      console.log('IPFS node is ready');
       this.ipfsNode.id((err, res) => {
         if (err) {
           throw err
@@ -92,6 +91,7 @@ class IdeaForm extends React.Component {
         <hr />
         <p>Submitted Idea's IPFS hash: {this.state.added_file_hash}</p>
         <p>Submitted Idea's content: {this.state.added_file_contents}</p>
+        <p>Checkout the uploaded idea at: {PUBLIC_GATEWAY}/{this.state.added_file_hash}</p>
         <hr />
         <form>
           <FormGroup
